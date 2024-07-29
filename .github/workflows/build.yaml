@@ -7,10 +7,10 @@ on:
         required: true
         type: string
       cache-key:
-        description: "PHP Version"
+        description: "Cache key"
         required: true
         type: string
-        
+
 jobs:
   build:
     name: Build Laravel App
@@ -38,8 +38,6 @@ jobs:
           composer install
 
       - name: Cache the Vendor
-        shell: bash
-        if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache@v4.0.2
         with:
           key: ${{ inputs.cache-key }}

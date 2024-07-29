@@ -6,6 +6,11 @@ on:
         description: "PHP Version"
         required: true
         type: string
+      cache-key:
+        description: "Cache key"
+        required: true
+        type: string
+
 jobs:
   build:
     name: Build Laravel App
@@ -33,8 +38,6 @@ jobs:
           composer install
 
       - name: Cache the Vendor
-        shell: bash
-        if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache@v4.0.2
         with:
           key: ${{ inputs.cache-key }}
@@ -43,7 +46,7 @@ jobs:
       - name: Create .env
         shell: bash
         run: |
-          cp .env.testing .env
+          cp .env.example .env
 
       - name: Generate the key
         shell: bash

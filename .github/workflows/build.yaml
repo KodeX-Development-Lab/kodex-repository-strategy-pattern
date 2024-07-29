@@ -1,0 +1,51 @@
+name: Build Laravel App
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        description: "PHP Version"
+        required: true
+        type: string
+jobs:
+  build:
+    name: Build Laravel App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version }}
+
+      - name: Restore the Cache
+        id: cache
+        uses: actions/cache@v4.0.2
+        with:
+          path: ./vendor
+          key: ${{ inputs.cache-key }}
+
+      - name: Composer Install
+        shell: bash
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          composer install
+
+      - name: Cache the Vendor
+        shell: bash
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v4.0.2
+        with:
+          key: ${{ inputs.cache-key }}
+          path: ./vendor
+
+      - name: Create .env
+        shell: bash
+        run: |
+          cp .env.testing .env
+
+      - name: Generate the key
+        shell: bash
+        run: |
+          php artisan key:generate

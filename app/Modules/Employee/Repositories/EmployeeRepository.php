@@ -18,7 +18,21 @@ class EmployeeRepository implements EmployeeInterface
 
     public function save($request): Employee
     {
-        $country = Country::findOrFail($request->country_id);
+        $employee = Employee::create([
+            'code'           => $this->generateCode(),
+            'name'           => $request->name,
+            'preferred_name' => $request->preferred_name,
+            'email'          => $request->email,
+            'joined_date'    => $request->joined_date,
+            'country_id'     => $request->employee_id,
+        ]);
+
+        return $employee;
+    }
+
+    public function saveLeaveAllowance($employee)
+    {
+        $country = Country::findOrFail($employee->country_id);
 
         if ($country->code == self::MALAYSIA_COUNRY_CODE) {
             $this->leave_application = new MalaysiaLeaveApplicationRepository();
@@ -26,21 +40,12 @@ class EmployeeRepository implements EmployeeInterface
             $this->leave_application = new MyanmarLeaveApplicationRepository();
         }
 
-        $employee = Employee::create([
-            'code'           => $this->generateCode(),
-            'name'           => $request->name,
-            'preferred_name' => $request->preferred_name,
-            'email'          => $request->email,
-            'joined_date'    => $request->joined_date,
-            'country_id'     => $country->id,
-        ]);
-
-        LeaveAllowance::create([
+        $allowance = LeaveAllowance::create([
             'employee_id' => $employee->id,
             'allowance'   => $this->leave_application->getLeaveAllowance($employee),
         ]);
 
-        return $employee;
+        return $allowance;
     }
 
     public function generateCode(): string

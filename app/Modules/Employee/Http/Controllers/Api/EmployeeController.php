@@ -19,7 +19,10 @@ class EmployeeController extends Controller
     public function store(CreateEmployeeRequest $request)
     {
         DB::beginTransaction();
+
         $employee = $this->repository->save($request);
+        $this->repository->saveLeaveAllowance($employee);
+
         DB::commit();
 
         return response()->json([
@@ -28,6 +31,6 @@ class EmployeeController extends Controller
                 'employee' => $employee,
             ],
             'message' => 'Successfully saved',
-        ], 200);
+        ], 201);
     }
 }

@@ -8,7 +8,6 @@ use Carbon\Carbon;
 
 class MalaysiaLeaveApplicationRepository implements LeaveApplicationInterface
 {
-
     public function getLeaveAllowance(Employee $employee): float
     {
         $years = Carbon::parse($employee->joined_date)->diffInYears(Carbon::now());
